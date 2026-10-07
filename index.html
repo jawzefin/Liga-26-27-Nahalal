@@ -51,7 +51,7 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 .sc{background:var(--sf);border:1px solid var(--acc);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:14px}
 .sc .hh{color:var(--mute)}.sc .hh b{color:var(--acc)}.sc .hm .lg{width:48px;height:48px}.sc .tm{flex-direction:row;font-size:.9rem}
 .sc a{display:block;text-align:center;font-weight:800;color:var(--acc);font-size:.9rem}
-.empty{text-align:center;color:var(--mute);padding:14px 0;font-weight:600}
+.save{display:grid;place-items:center;height:54px;border-radius:27px;background:var(--acc);color:var(--on);font-weight:800}.empty{text-align:center;color:var(--mute);padding:14px 0;font-weight:600}
 .h2{margin:0;font-size:1.4rem;font-weight:900}.sub{color:var(--mute);font-size:.85rem;margin:2px 0 0}
 .search{display:flex;align-items:center;gap:10px;background:var(--sf);border:1px solid var(--line);border-radius:16px;padding:0 14px;height:48px}
 .search input{all:unset;flex:1;font:inherit;color:var(--ink)}.search svg{width:18px;height:18px;stroke:var(--mute);fill:none;stroke-width:2.2}
@@ -62,7 +62,7 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 .rd{width:22px;height:22px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;flex:none}.on .rd{border-color:var(--acc)}.on .rd:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--acc)}
 </style></head><body>
 <div class="w">
-<div class="bar"><a href="#"><h1>ליגת ילדים ב׳ שרון</h1><p>עונת 2026/27</p></a>
+<div class="bar" id="top"><a href="#"><h1>ליגת ילדים ב׳ שרון</h1><p>עונת 2026/27</p></a>
 <div class="ico"><a class="ic" id="bc" href="#cal" aria-label="לוח שנה"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 10h18M8 2.5v4M16 2.5v4"/></svg></a>
 <a class="ic" id="bs" href="#set" aria-label="הגדרות"><svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a></div></div>
 <main id="app" class="w" style="padding:0"></main>
@@ -89,11 +89,12 @@ const zp=n=>n.includes("צו פיוס")?'<span class="zp">צו פיוס</span>':
 const dh=ds=>{const d=dt(ds);return `<div class="day">יום ${DAYS[d.getDay()]} · ${d.getDate()} ${MON[d.getMonth()]}</div>`};
 const side=(n,a,tm)=>`<div class="s ${a?"a":""}">${logo(n,n===ME)}<div><span>${nm(n)}</span>${zp(n)}</div></div>`;
 const row=(g,tm)=>`<div class="g">${side(g[0])}<div class="vs">${tm?`<i>${tm}</i>`:"נגד"}</div>${side(g[1],1)}</div>`;
-let cur=0,calM=null,calD=null;
+let cur=0,calM=null,calD=null,lastR="";
+const back=(t,s)=>`<div class="bar"><a class="ic" href="#${lastR}" aria-label="חזרה"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a><div style="text-align:center"><h1>${t}</h1><p>${s}</p></div><span style="width:44px"></span></div>`;
 const nextIdx=()=>{const i=D.findIndex(r=>{const g=mine(r);return g&&dt(gd(r,g)[0])>=today});return i<0?D.length-1:i};
 
 function round(i){
- cur=Math.min(D.length-1,Math.max(0,i));const r=D[cur],g=mine(r),[md,mt]=gd(r,g),d=dt(md),home=g[0]===ME,opp=home?g[1]:g[0];
+ cur=Math.min(D.length-1,Math.max(0,i));lastR=D[cur].n;const r=D[cur],g=mine(r),[md,mt]=gd(r,g),d=dt(md),home=g[0]===ME,opp=home?g[1]:g[0];
  const by={};r.g.filter(x=>x!==g).forEach(x=>{const[ds,tm]=gd(r,x);(by[ds]=by[ds]||[]).push([x,tm])});
  const ks=Object.keys(by).sort((x,y)=>dt(x)-dt(y)),many=ks.length>1||ks[0]!==md;
  $("app").innerHTML=`<div class="nav"><a class="ic" id="pv" ${cur?`href="#${D[cur-1].n}"`:"disabled"} aria-label="מחזור קודם"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
@@ -116,7 +117,7 @@ function cal(){
  const cells=Array(lead).fill("<span></span>").join("")+Array.from({length:n},(_,k)=>{const d=k+1,x=by[d],c=["",x&&"gm",x&&x.g[0]===ME&&"h",d==calD&&"sel",+new Date(y,m,d)==+today&&"td"].filter(Boolean).join(" ");return `<button class="${c}" data-d="${d}" aria-label="${d}">${d}<i></i></button>`}).join("");
  const s=by[calD];let card=`<div class="empty">אין משחק ביום הזה</div>`;
  if(s){const home=s.g[0]===ME,opp=home?s.g[1]:s.g[0];card=`<div class="hh"><b>מחזור ${s.r.n}</b><span>${DAYS[s.d.getDay()]} · ${s.d.getDate()} ${MON[s.d.getMonth()]}${s.tm?" · "+s.tm:""}</span><span class="chip">${home?"בית":"חוץ"}</span></div><div class="hm"><div class="tm me">${logo(ME,1)}${nm(ME)}</div><div class="vs">נגד</div><div class="tm">${logo(opp)}${nm(opp)}</div></div><a href="#${s.r.n}">למחזור ${s.r.n} ←</a>`}
- $("app").innerHTML=`<div class="cal"><div class="cm"><button class="ic" id="cp" aria-label="חודש קודם" ${pm<new Date(first.getFullYear(),first.getMonth(),1)?"disabled":""}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><b>${MFULL[m]} ${y}</b><button class="ic" id="cn" aria-label="חודש הבא" ${nx>last?"disabled":""}><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M9 6l6 6-6 6"/></svg></button></div>
+ $("app").innerHTML=back("לוח שנה","המשחקים של "+nm(ME))+`<div class="cal"><div class="cm"><button class="ic" id="cp" aria-label="חודש קודם" ${pm<new Date(first.getFullYear(),first.getMonth(),1)?"disabled":""}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><b>${MFULL[m]} ${y}</b><button class="ic" id="cn" aria-label="חודש הבא" ${nx>last?"disabled":""}><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M9 6l6 6-6 6"/></svg></button></div>
  <div class="wd">${["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"].map(x=>`<div>${x}</div>`).join("")}</div><div class="gr">${cells}</div>
  <div class="lgd"><span><i class="f"></i>בית</span><span><i></i>חוץ</span></div></div><div class="sc">${card}</div>`;
  $("cp").onclick=()=>{calM=pm;calD=0;cal()};$("cn").onclick=()=>{calM=nx;calD=0;cal()};
@@ -124,15 +125,16 @@ function cal(){
 }
 function settings(q=""){
  const list=TEAMS.filter(t=>nm(t).includes(q));
- $("app").innerHTML=`<div><h2 class="h2">הקבוצה שלי</h2><p class="sub">המשחק של הקבוצה הזאת יופיע ראשון בכל מחזור ובלוח השנה.</p></div>
+ $("app").innerHTML=back("הגדרות","ליגת ילדים ב׳ שרון · 2026/27")+`<div><h2 class="h2">הקבוצה שלי</h2><p class="sub">המשחק של הקבוצה הזאת יופיע ראשון בכל מחזור ובלוח השנה.</p></div>
  <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="חיפוש קבוצה" value="${q}"></label>
- <div class="cl">${list.map(t=>`<button class="${t===ME?"on":""}" data-t="${t.replace(/"/g,"&quot;")}"><span class="rd"></span>${logo(t)}<span class="n">${nm(t)}</span>${zp(t)}</button>`).join("")||'<div class="empty">לא נמצאו קבוצות</div>'}</div>`;
+ <div class="cl">${list.map(t=>`<button class="${t===ME?"on":""}" data-t="${t.replace(/"/g,"&quot;")}"><span class="rd"></span>${logo(t)}<span class="n">${nm(t)}</span>${zp(t)}</button>`).join("")||'<div class="empty">לא נמצאו קבוצות</div>'}</div>
+ <a class="save" href="#${lastR}">שמירה</a>`;
  document.querySelectorAll(".cl button").forEach(b=>b.onclick=()=>{ME=b.dataset.t;try{localStorage.setItem("team",ME)}catch(e){}calM=null;settings(q)});
  const i=$("q");i.oninput=()=>{const p=i.selectionStart;settings(i.value);$("q").focus();$("q").setSelectionRange(p,p)};
 }
 function route(){
  const h=location.hash.slice(1);
- $("bc").classList.toggle("on",h=="cal");$("bs").classList.toggle("on",h=="set");
+ $("top").style.display=h=="cal"||h=="set"?"none":"";
  if(h=="cal")cal();else if(h=="set")settings();else round(h?Math.max(0,D.findIndex(r=>r.n==h)):nextIdx());
 }
 addEventListener("hashchange",route);
