@@ -90,6 +90,8 @@ const dh=ds=>{const d=dt(ds);return `<div class="day">יום ${DAYS[d.getDay()]}
 const side=(n,a,tm)=>`<div class="s ${a?"a":""}">${logo(n,n===ME)}<div><span>${nm(n)}</span>${zp(n)}</div></div>`;
 const row=(g,tm)=>`<div class="g">${side(g[0])}<div class="vs">${tm?`<i>${tm}</i>`:"נגד"}</div>${side(g[1],1)}</div>`;
 let cur=0,calM=null,calD=null,lastR="";
+// home team on the right (first in RTL), away on the left
+const ord=(home,mid,opp)=>{const me=`<div class="tm me">${logo(ME,1)}${nm(ME)}</div>`,o=`<div class="tm">${logo(opp)}${nm(opp)}${zp(opp)}</div>`;return home?me+mid+o:o+mid+me};
 const back=(t,s)=>`<div class="bar"><a class="ic" href="#${lastR}" aria-label="חזרה"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a><div style="text-align:center"><h1>${t}</h1><p>${s}</p></div><span style="width:44px"></span></div>`;
 const nextIdx=()=>{const i=D.findIndex(r=>{const g=mine(r);return g&&dt(gd(r,g)[0])>=today});return i<0?D.length-1:i};
 
@@ -102,7 +104,7 @@ function round(i){
  <a class="ic" id="nx" ${cur<D.length-1?`href="#${D[cur+1].n}"`:"disabled"} aria-label="מחזור הבא"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M9 6l6 6-6 6"/></svg></a></div>
  <div class="prog"><i><b style="width:${(cur+1)/D.length*100}%"></b></i><span dir="ltr">${cur+1} / ${D.length}</span></div>
  <div class="hero"><div class="hh"><span>המשחק של ${nm(ME)}</span><span class="chip">${home?"בית":"חוץ"}</span></div>
- <div class="hm"><div class="tm me">${logo(ME,1)}${nm(ME)}</div><div class="dt">${DAYS[d.getDay()]}<b>${d.getDate()}</b>${MON[d.getMonth()]}${mt?`<i>${mt}</i>`:""}</div><div class="tm">${logo(opp)}${nm(opp)}${zp(opp)}</div></div></div>
+ <div class="hm">${ord(home,`<div class="dt">${DAYS[d.getDay()]}<b>${d.getDate()}</b>${MON[d.getMonth()]}${mt?`<i>${mt}</i>`:""}</div>`,opp)}</div></div>
  <div class="sec">שאר המשחקים במחזור<span>${r.g.length-1}</span></div>
  <div class="list">${ks.map(ds=>(many?dh(ds):"")+by[ds].map(([x,tm])=>row(x,tm)).join("")).join("")}</div>
  <p class="note"><span class="zp" style="display:inline">צו פיוס</span> לא משחקת בשבת</p>`;
@@ -116,7 +118,7 @@ function cal(){
  const first=games[0].d,last=games[games.length-1].d,pm=new Date(y,m-1,1),nx=new Date(y,m+1,1);
  const cells=Array(lead).fill("<span></span>").join("")+Array.from({length:n},(_,k)=>{const d=k+1,x=by[d],c=["",x&&"gm",x&&x.g[0]===ME&&"h",d==calD&&"sel",+new Date(y,m,d)==+today&&"td"].filter(Boolean).join(" ");return `<button class="${c}" data-d="${d}" aria-label="${d}">${d}<i></i></button>`}).join("");
  const s=by[calD];let card=`<div class="empty">אין משחק ביום הזה</div>`;
- if(s){const home=s.g[0]===ME,opp=home?s.g[1]:s.g[0];card=`<div class="hh"><b>מחזור ${s.r.n}</b><span>${DAYS[s.d.getDay()]} · ${s.d.getDate()} ${MON[s.d.getMonth()]}${s.tm?" · "+s.tm:""}</span><span class="chip">${home?"בית":"חוץ"}</span></div><div class="hm"><div class="tm me">${logo(ME,1)}${nm(ME)}</div><div class="vs">נגד</div><div class="tm">${logo(opp)}${nm(opp)}</div></div><a href="#${s.r.n}">למחזור ${s.r.n} ←</a>`}
+ if(s){const home=s.g[0]===ME,opp=home?s.g[1]:s.g[0];card=`<div class="hh"><b>מחזור ${s.r.n}</b><span>${DAYS[s.d.getDay()]} · ${s.d.getDate()} ${MON[s.d.getMonth()]}${s.tm?" · "+s.tm:""}</span><span class="chip">${home?"בית":"חוץ"}</span></div><div class="hm">${ord(home,'<div class="vs">נגד</div>',opp)}</div><a href="#${s.r.n}">למחזור ${s.r.n} ←</a>`}
  $("app").innerHTML=back("לוח שנה","המשחקים של "+nm(ME))+`<div class="cal"><div class="cm"><button class="ic" id="cp" aria-label="חודש קודם" ${pm<new Date(first.getFullYear(),first.getMonth(),1)?"disabled":""}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button><b>${MFULL[m]} ${y}</b><button class="ic" id="cn" aria-label="חודש הבא" ${nx>last?"disabled":""}><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><path d="M9 6l6 6-6 6"/></svg></button></div>
  <div class="wd">${["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"].map(x=>`<div>${x}</div>`).join("")}</div><div class="gr">${cells}</div>
  <div class="lgd"><span><i class="f"></i>בית</span><span><i></i>חוץ</span></div></div><div class="sc">${card}</div>`;
