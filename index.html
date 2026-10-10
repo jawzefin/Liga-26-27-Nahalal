@@ -39,6 +39,7 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 .s>div{display:flex;flex-direction:column;gap:2px;min-width:0}.s.a>div{align-items:flex-end}
 .vs{font-size:.7rem;font-weight:700;color:var(--mute);text-align:center}.vs i{font-style:normal;font-size:.8rem;color:var(--ink)}
 .zp{font-size:.62rem;font-weight:800;color:#2b1d00;background:var(--gold);border-radius:6px;padding:0 6px;align-self:flex-start}.s.a .zp{align-self:flex-end}
+.upd{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--acc) 14%,var(--sf));border:1px solid var(--acc);border-radius:16px;padding:10px 14px;font-size:.82rem;font-weight:700;line-height:1.3}.upd>span{flex:1}.upd[hidden]{display:none}.upd button{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;color:var(--mute);flex:none}
 .note{text-align:center;color:var(--mute);font-size:.8rem}
 .cal{background:var(--sf);border:1px solid var(--line);border-radius:28px;padding:14px 12px 16px}
 .cm{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}.cm b{font-size:1.2rem;font-weight:800}
@@ -65,6 +66,7 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 <div class="bar" id="top"><a href="#"><h1>ליגת ילדים ב׳ שרון</h1><p>עונת 2026/27</p></a>
 <div class="ico"><a class="ic" id="bc" href="#cal" aria-label="לוח שנה"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 10h18M8 2.5v4M16 2.5v4"/></svg></a>
 <a class="ic" id="bs" href="#set" aria-label="הגדרות"><svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a></div></div>
+<div class="upd" id="upd" hidden><span>🔔 לוח המשחקים עודכן בתאריך <bdi>10/10/26</bdi> עם השינויים האחרונים</span><button id="ux" aria-label="סגירה">×</button></div>
 <main id="app" class="w" style="padding:0"></main>
 </div>
 <script>
@@ -73,6 +75,7 @@ const D=[{"n": 1, "d": "17/10/26", "g": [["מ.כ. נוה יוסף", "מכבי ע
 const MOVE={};
 const L={"מ.כ. נהלל יזרעאל": "nahalal", "הפועל חדרה \"צו פיוס\"": "hadera", "מ.ס. עמק חפר דרום": "emek-darom", "מ.כ. נוה יוסף": "neve-yosef", "מ.ס. קרית ים": "kiryat-yam", "הפועל עכו 1": "akko", "הפועל חיפה 1": "hapoel-haifa", "מכבי פ\"ת רום וילדר צפון": "petah-tikva", "מכבי ת\"א \"עופר דקל\"": "mta", "מכבי חיפה אפרים": "maccabi-haifa", "הפ' נוף הגליל": "nof-hagalil", "מכבי כפר סבא": "kfar-saba", "בית\"ר חיפה": "beitar-haifa", "הפ' ניר רמת השרון דרום": "nir-rh", "מכבי הרצליה": "herzliya", "בית\"ר טוברוק": "tuburuk", "הפועל הוד השרון": "hod-hasharon", "הפועל ת\"א צפון": "hapoel-ta", "ע. נשר אליאס אלימלך \"צו פיוס\"": "nesher"};
 const DAYS=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"],MON=["ינו׳","פבר׳","מרץ","אפר׳","מאי","יוני","יולי","אוג׳","ספט׳","אוק׳","נוב׳","דצמ׳"],MFULL=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+const UPDATED="10/10/26";
 const DEF="מ.כ. נהלל יזרעאל";
 let ME=DEF;try{ME=localStorage.getItem("team")||DEF}catch(e){}
 const TEAMS=[...new Set(D.flatMap(r=>r.g.flat()))].sort((a,b)=>(a===DEF?-1:b===DEF?1:0)||a.localeCompare(b,"he"));
@@ -136,9 +139,13 @@ function settings(q=""){
 }
 function route(){
  const h=location.hash.slice(1);
- $("top").style.display=h=="cal"||h=="set"?"none":"";
+ const sub=h=="cal"||h=="set";
+ $("top").style.display=sub?"none":"";
+ let seen;try{seen=localStorage.getItem("upd")}catch(e){}
+ $("upd").hidden=sub||seen===UPDATED;
  if(h=="cal")cal();else if(h=="set")settings();else round(h?Math.max(0,D.findIndex(r=>r.n==h)):nextIdx());
 }
+$("ux").onclick=()=>{try{localStorage.setItem("upd",UPDATED)}catch(e){}$("upd").hidden=true};
 addEventListener("hashchange",route);
 let x0;addEventListener("touchstart",e=>x0=e.touches[0].clientX);
 addEventListener("touchend",e=>{const h=location.hash.slice(1);if(h=="cal"||h=="set")return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>80)location.hash="#"+D[Math.min(D.length-1,Math.max(0,cur+(d>0?1:-1)))].n});
