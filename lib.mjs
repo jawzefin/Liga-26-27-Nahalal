@@ -52,7 +52,7 @@ export function validate(rounds, teamIds, perRound = teamIds.length / 2) {
   return errs;
 }
 
-const played = g => g.hs !== null && g.as !== null && !g.ex;
+export const played = g => g.hs !== null && g.as !== null && !g.ex;
 
 // Table. teams: { id: { name } }. Sort: points, goal difference, goals for, name.
 // ponytail: official tie-break rules unknown; pointsAdjustments not applied until the format is known.
