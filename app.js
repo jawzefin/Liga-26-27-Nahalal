@@ -97,7 +97,7 @@ function team(id) {
  <div class="wl"><span>${st.w} נצחונות</span><span>${st.d} תיקו</span><span>${st.l} הפסדים</span></div>
  <div class="k3"><div><b dir="ltr">${st.gf}:${st.ga}</b><span>שערים</span></div><div><b dir="ltr">${st.gd > 0 ? "+" : ""}${st.gd}</b><span>הפרש</span></div><div><b>${st.p ? st.pct + "%" : "—"}</b><span>הצלחה</span></div></div></div>
  ${nextCard}
- ${venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div>${waze(venue)}</div>` : ""}
+ ${venue && venue !== nx?.venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div>${waze(venue)}</div>` : ""}
  <div class="sec">תוצאות אחרונות</div>
  ${last.length ? `<div class="list">${last.map(resRow).join("")}</div>` : '<div class="dash">עוד לא שוחקו משחקים. התוצאות יופיעו כאן אחרי המחזור הראשון.</div>'}
  <div class="sec">כל המשחקים<span>${gs.length} מחזורים</span></div>
