@@ -92,3 +92,6 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 .wl{display:flex;justify-content:space-between;margin-top:-8px;font-size:.75rem;font-weight:700;color:var(--mute)}
 .k3{display:flex;border-top:1px solid var(--line);padding-top:14px}.k3>div{flex:1;text-align:center}.k3>div+div{border-inline-start:1px solid var(--line)}
 .k3 b{display:block;font-size:1.1rem;font-weight:900}.k3 span{display:block;font-size:.7rem;font-weight:700;color:var(--mute);margin-top:3px}
+.wel h2{margin:0;font-size:2rem;font-weight:900;line-height:1.1}.wel{padding-top:8px}
+button.save{width:100%}.save[disabled]{opacity:.4;pointer-events:none}
+.skip{text-align:center;color:var(--mute);font-weight:700;font-size:.9rem;padding:6px 0;width:100%}

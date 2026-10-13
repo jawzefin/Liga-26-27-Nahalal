@@ -15,6 +15,9 @@ const todayS = iso(new Date());
 // favourite team: stored as id (older versions stored the team name)
 let ME; try { ME = localStorage.getItem("team"); } catch {}
 if (!teams[ME]) ME = Object.keys(teams).find(i => teams[i].name === ME) || DEF;
+// first visit = nothing stored yet (skipped when storage is unavailable, so private mode never loops on the welcome screen)
+let needOnboard = false, pick = null, syncUpd = () => {};
+try { needOnboard = !localStorage.getItem("team"); localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); } catch { needOnboard = false; }
 const setMe = id => { ME = id; try { localStorage.setItem("team", id); } catch {} calM = null; };
 
 const NAV = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
@@ -121,26 +124,39 @@ function cal() {
  <div class="lgd"><span><i class="f"></i>בית</span><span><i></i>חוץ</span></div></div><div class="sc">${card}</div>`;
 }
 
-function settings(q = "") {
+const picker = (q, sel) => {
   const list = Object.keys(teams).sort((a, b) => (a === DEF ? -1 : b === DEF ? 1 : 0) || nm(a).localeCompare(nm(b), "he")).filter(t => nm(t).includes(q));
+  return `<label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="חיפוש קבוצה" value="${q}"></label>
+ <div class="cl">${list.map(t => `<button class="${t === sel ? "on" : ""}" data-t="${t}"><span class="rd"></span>${logo(t)}<span class="n">${nm(t)}</span>${zp(t)}</button>`).join("") || '<div class="empty">לא נמצאו קבוצות</div>'}</div>`;
+};
+
+function settings(q = "") {
   return backBar("הגדרות", "ליגת ילדים ב׳ שרון · 2026/27") + `<div><h2 class="h2">הקבוצה שלי</h2><p class="sub">המשחק של הקבוצה הזאת יופיע ראשון בכל מחזור ובלוח השנה.</p></div>
- <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="חיפוש קבוצה" value="${q}"></label>
- <div class="cl">${list.map(t => `<button class="${t === ME ? "on" : ""}" data-t="${t}"><span class="rd"></span>${logo(t)}<span class="n">${nm(t)}</span>${zp(t)}</button>`).join("") || '<div class="empty">לא נמצאו קבוצות</div>'}</div>
+ ${picker(q, ME)}
  <a class="save" href="${lastTab}">שמירה</a>`;
+}
+
+function welcome(q = "") {
+  return `<div class="wel"><h2>ברוכים הבאים</h2><p class="sub">ליגת ילדים ב׳ שרון · עונת 2026/27</p></div>
+ <div><h2 class="h2">איזו קבוצה אתם עוקבים אחריה?</h2><p class="sub">המשחק שלה יופיע ראשון בכל מחזור ובלוח השנה. אפשר להחליף בכל רגע בהגדרות.</p></div>
+ ${picker(q, pick)}
+ <button class="save" id="go" ${pick ? "" : "disabled"}>המשך</button>
+ <button class="skip" id="skip">דלג, אבחר אחר כך</button>`;
 }
 
 function render() {
   const h = location.hash.replace(/^#\/?/, ""), [a, b] = h.split("/");
-  const sub = a == "cal" || a == "set" || (a == "team" && teams[b]);
+  const sub = needOnboard || a == "cal" || a == "set" || (a == "team" && teams[b]);
   $("top").style.display = sub ? "none" : "";
   let html;
-  if (a == "cal") html = cal();
+  if (needOnboard) html = welcome();
+  else if (a == "cal") html = cal();
   else if (a == "set") html = settings();
   else if (a == "team" && teams[b]) html = team(b);
   else if (a == "rounds" || /^\d+$/.test(a)) html = rounds(+(b || a) || 0);
   else html = table();
   $("app").innerHTML = html;
-  bind(a, b);
+  bind(needOnboard ? "welcome" : a, b);
   scrollTo(0, 0);
 }
 
@@ -150,6 +166,13 @@ function bind(a, b) {
     $("cp").onclick = () => { calM = new Date(calM.getFullYear(), calM.getMonth() - 1, 1); calD = 0; rerender(); };
     $("cn").onclick = () => { calM = new Date(calM.getFullYear(), calM.getMonth() + 1, 1); calD = 0; rerender(); };
     document.querySelectorAll(".gr button").forEach(x => x.onclick = () => { calD = +x.dataset.d; rerender(); });
+  } else if (a == "welcome") {
+    const draw = q => { $("app").innerHTML = welcome(q); bind("welcome"); };
+    document.querySelectorAll(".cl button").forEach(x => x.onclick = () => { pick = x.dataset.t; draw($("q").value); });
+    const i = $("q"); i.oninput = () => { const p = i.selectionStart; draw(i.value); $("q").focus(); $("q").setSelectionRange(p, p); };
+    const done = id => { setMe(id); needOnboard = false; syncUpd(); if (!location.hash) location.hash = "#/table"; render(); };
+    if (pick) $("go").onclick = () => done(pick);
+    $("skip").onclick = () => done(DEF);
   } else if (a == "set") {
     document.querySelectorAll(".cl button").forEach(x => x.onclick = () => { setMe(x.dataset.t); rerender(); });
     const i = $("q"); i.oninput = () => { const p = i.selectionStart; $("app").innerHTML = settings(i.value); bind("set"); $("q").focus(); $("q").setSelectionRange(p, p); };
@@ -171,9 +194,9 @@ addEventListener("hashchange", render);
   let seen; try { seen = localStorage.getItem("upd"); } catch {}
   const recent = Date.now() - new Date(up) < 3 * 864e5;
   $("updt").innerHTML = `🔔 לוח המשחקים עודכן בתאריך <bdi>${dmy(day)}/${day.slice(2, 4)}</bdi>`;
-  const sync = () => { const h = location.hash; $("upd").hidden = !recent || seen === up || /#\/(cal|set|team)/.test(h); };
+  const sync = () => { const h = location.hash; $("upd").hidden = needOnboard || !recent || seen === up || /#\/(cal|set|team)/.test(h); };
   $("ux").onclick = () => { seen = up; try { localStorage.setItem("upd", up); } catch {} sync(); };
-  addEventListener("hashchange", sync); sync();
+  syncUpd = sync; addEventListener("hashchange", sync); sync();
 }
 
 let x0;
