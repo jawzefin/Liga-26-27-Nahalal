@@ -85,3 +85,10 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 #app{width:100%;display:flex;flex-direction:column;gap:18px}
 .waze{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:23px;background:var(--acc);color:var(--on);font-weight:800;font-size:.9rem;flex:none;padding:0 18px}.waze svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .ven .waze{margin-inline-start:auto;height:40px;padding:0 14px;font-size:.8rem}
+.kpi{background:var(--sf);border:1px solid var(--line);border-radius:26px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:16px}
+.kt{display:flex;align-items:center;justify-content:space-between}.kt .chip{font-size:.8rem;border-radius:12px;padding:5px 12px}
+.kp{display:flex;align-items:baseline;gap:8px}.kp b{font-size:2.75rem;font-weight:900;line-height:1}.kp span{font-size:.88rem;font-weight:700;color:var(--mute)}.kp small{font-size:.75rem;font-weight:600;color:var(--mute)}
+.wdl{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px}.wdl i{display:block}.wdl .W{background:#2f9e5b}.wdl .D{background:#8a93a8}.wdl .L{background:#c24b4b}.wdl .E{flex:1;background:var(--line)}
+.wl{display:flex;justify-content:space-between;margin-top:-8px;font-size:.75rem;font-weight:700;color:var(--mute)}
+.k3{display:flex;border-top:1px solid var(--line);padding-top:14px}.k3>div{flex:1;text-align:center}.k3>div+div{border-inline-start:1px solid var(--line)}
+.k3 b{display:block;font-size:1.1rem;font-weight:900}.k3 span{display:block;font-size:.7rem;font-weight:700;color:var(--mute);margin-top:3px}

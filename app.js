@@ -80,7 +80,6 @@ function team(id) {
   const res = g => { const [f, a] = mine$(g); return f > a ? "W" : f < a ? "L" : "D"; };
   const HE = { W: "נ", D: "ת", L: "ה" };
   const sc = g => { const [f, a] = mine$(g); return `<bdi dir="ltr">${f} - ${a}</bdi>`; };
-  const stats = [["מש׳", st.p], ["נצ׳", st.w], ["ת׳", st.d], ["הפ׳", st.l], ["שערים", `<bdi dir="ltr">${st.gf}:${st.ga}</bdi>`], ["הפרש", `<bdi dir="ltr">${st.gd > 0 ? "+" : ""}${st.gd}</bdi>`], ["הצלחה", st.p ? st.pct + "%" : "—"]];
   const days = nx ? Math.round((D(nx.date) - D(todayS)) / 864e5) : 0;
   const nextCard = nx ? (() => { const d = D(nx.date), [a, b] = head(nx).split("@@");
     return `<div class="nx"><div class="hh"><span>המשחק הבא · מחזור ${nx.n}</span><span class="chip">${nx.home === id ? "בית" : "חוץ"}</span></div>
@@ -92,8 +91,11 @@ function team(id) {
   const shown = gs.slice(from, from + WIN);
   const fxRow = g => fxRowOf(g, id, nx);
   const star = `<button class="fav-b ${fav ? "on" : ""}" id="fav" aria-label="הקבוצה שלי"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></button>`;
-  return backBar("דף קבוצה", "", star) + `<div class="tp">${logo(id)}<h2>${nm(id)}</h2><div class="pl">${fav ? '<span class="chip">הקבוצה שלי</span>' : ""}${zp(id)}<span>${st.p ? `מקום ${st.pos} · ${st.pts} נק׳` : "עוד לא שוחקו משחקים"}</span></div>${st.form.length ? `<div class="form">${st.form.map(f => `<span class="fm ${f}">${HE[f]}</span>`).join("")}</div>` : ""}</div>
- <div class="stats">${stats.map(([l, v]) => `<div><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+  return backBar("דף קבוצה", "", star) + `<div class="tp">${logo(id)}<h2>${nm(id)}</h2><div class="pl">${fav ? '<span class="chip">הקבוצה שלי</span>' : ""}${zp(id)}${st.p ? "" : "<span>עוד לא שוחקו משחקים</span>"}</div>${st.form.length ? `<div class="form">${st.form.map(f => `<span class="fm ${f}">${HE[f]}</span>`).join("")}</div>` : ""}</div>
+ <div class="kpi"><div class="kt"><div class="kp"><b>${st.pts}</b><span>נקודות</span><small>${st.p} משחקים</small></div>${st.p ? `<span class="chip">מקום ${st.pos}</span>` : ""}</div>
+ <div class="wdl">${st.p ? `${st.w ? `<i class="W" style="flex:${st.w}"></i>` : ""}${st.d ? `<i class="D" style="flex:${st.d}"></i>` : ""}${st.l ? `<i class="L" style="flex:${st.l}"></i>` : ""}` : '<i class="E"></i>'}</div>
+ <div class="wl"><span>${st.w} נצחונות</span><span>${st.d} תיקו</span><span>${st.l} הפסדים</span></div>
+ <div class="k3"><div><b dir="ltr">${st.gf}:${st.ga}</b><span>שערים</span></div><div><b dir="ltr">${st.gd > 0 ? "+" : ""}${st.gd}</b><span>הפרש</span></div><div><b>${st.p ? st.pct + "%" : "—"}</b><span>הצלחה</span></div></div></div>
  ${nextCard}
  ${venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div>${waze(venue)}</div>` : ""}
  <div class="sec">תוצאות אחרונות</div>
