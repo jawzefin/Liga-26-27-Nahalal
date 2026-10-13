@@ -17,6 +17,8 @@ let ME; try { ME = localStorage.getItem("team"); } catch {}
 if (!teams[ME]) ME = Object.keys(teams).find(i => teams[i].name === ME) || DEF;
 const setMe = id => { ME = id; try { localStorage.setItem("team", id); } catch {} calM = null; };
 
+const NAV = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
+const waze = (v, cls = "") => `<a class="waze ${cls}" target="_blank" rel="noopener" href="https://waze.com/ul?q=${encodeURIComponent(v)}&navigate=yes">${NAV}ניווט ב-Waze</a>`;
 const nm = id => teams[id].name.replace(/\s*"צו פיוס"/, "");
 const zp = id => teams[id].zp ? '<span class="zp">צו פיוס</span>' : "";
 const hue = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
@@ -83,7 +85,7 @@ function team(id) {
   const nextCard = nx ? (() => { const d = D(nx.date), [a, b] = head(nx).split("@@");
     return `<div class="nx"><div class="hh"><span>המשחק הבא · מחזור ${nx.n}</span><span class="chip">${nx.home === id ? "בית" : "חוץ"}</span></div>
  <div class="hm">${a}<div class="dt">${DAYS[d.getDay()]}<b>${d.getDate()}</b>${MON[d.getMonth()]}</div>${b}</div>
- <div class="nf"><span>${nx.time ? "שעה: " + nx.time : "שעה: טרם נקבעה"}${nx.venue ? " · " + nx.venue : ""}</span><span>${days <= 0 ? "היום" : days == 1 ? "מחר" : "בעוד " + days + " ימים"}</span></div></div>` })() : "";
+ <div class="nf"><span>${nx.time ? "שעה: " + nx.time : "שעה: טרם נקבעה"}${nx.venue ? " · " + nx.venue : ""}</span><span>${days <= 0 ? "היום" : days == 1 ? "מחר" : "בעוד " + days + " ימים"}</span></div>${nx.venue ? waze(nx.venue) : ""}</div>` })() : "";
   const resRow = g => { const o = opp(g), r = res(g);
     return `<a class="fx res" href="#/team/${o}"><div class="n">${g.n}</div><div class="o">${logo(o)}<div><b>${nm(o)}</b><small>${g.home === id ? "בית" : "חוץ"} · ${dmy(g.date)}</small></div></div><div class="scr">${sc(g)}</div><span class="fm ${r}">${HE[r]}</span></a>`; };
   const ni = Math.max(0, gs.indexOf(nx)), from = Math.max(0, ni - 1), WIN = 6;
@@ -93,7 +95,7 @@ function team(id) {
   return backBar("דף קבוצה", "", star) + `<div class="tp">${logo(id)}<h2>${nm(id)}</h2><div class="pl">${fav ? '<span class="chip">הקבוצה שלי</span>' : ""}${zp(id)}<span>${st.p ? `מקום ${st.pos} · ${st.pts} נק׳` : "עוד לא שוחקו משחקים"}</span></div>${st.form.length ? `<div class="form">${st.form.map(f => `<span class="fm ${f}">${HE[f]}</span>`).join("")}</div>` : ""}</div>
  <div class="stats">${stats.map(([l, v]) => `<div><b>${v}</b><span>${l}</span></div>`).join("")}</div>
  ${nextCard}
- ${venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div></div>` : ""}
+ ${venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div>${waze(venue)}</div>` : ""}
  <div class="sec">תוצאות אחרונות</div>
  ${last.length ? `<div class="list">${last.map(resRow).join("")}</div>` : '<div class="dash">עוד לא שוחקו משחקים. התוצאות יופיעו כאן אחרי המחזור הראשון.</div>'}
  <div class="sec">כל המשחקים<span>${gs.length} מחזורים</span></div>
