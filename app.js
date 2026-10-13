@@ -11,14 +11,16 @@ const pad = n => String(n).padStart(2, "0");
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const D = s => { const [y, m, d] = s.split("-"); return new Date(+y, m - 1, +d); };
 const todayS = iso(new Date());
-
+// favourite team: stored as a team id
 // favourite team: stored as id (older versions stored the team name)
-let ME; try { ME = localStorage.getItem("team"); } catch {}
-if (!teams[ME]) ME = Object.keys(teams).find(i => teams[i].name === ME) || DEF;
+// "team2": a new key resets everyone once (the old "team" key held defaults chosen by mistake); bump it to reset again
+const KEY = "team2";
+let ME; try { ME = localStorage.getItem(KEY); localStorage.removeItem("team"); } catch {}
+if (!teams[ME]) ME = DEF;
 // first visit = nothing stored yet (skipped when storage is unavailable, so private mode never loops on the welcome screen)
 let needOnboard = false, pick = null, syncUpd = () => {};
-try { needOnboard = !localStorage.getItem("team"); localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); } catch { needOnboard = false; }
-const setMe = id => { ME = id; try { localStorage.setItem("team", id); } catch {} calM = null; };
+try { needOnboard = !localStorage.getItem(KEY); localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); } catch { needOnboard = false; }
+const setMe = id => { ME = id; try { localStorage.setItem(KEY, id); } catch {} calM = null; };
 
 const NAV = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
 const waze = (v, cls = "") => `<a class="waze ${cls}" target="_blank" rel="noopener" href="https://waze.com/ul?q=${encodeURIComponent(v)}&navigate=yes">${NAV}ניווט ב-Waze</a>`;
