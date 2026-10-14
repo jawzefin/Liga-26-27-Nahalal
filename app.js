@@ -100,7 +100,7 @@ function team(id) {
  <div class="kpi"><div class="kt"><div class="kp"><b>${st.pts}</b><span>נקודות</span><small>${st.p} משחקים</small></div>${st.p ? `<span class="chip">מקום ${st.pos}</span>` : ""}</div>
  <div class="wdl">${st.p ? `${st.w ? `<i class="W" style="flex:${st.w}"></i>` : ""}${st.d ? `<i class="D" style="flex:${st.d}"></i>` : ""}${st.l ? `<i class="L" style="flex:${st.l}"></i>` : ""}` : '<i class="E"></i>'}</div>
  <div class="wl"><span>${st.w} נצחונות</span><span>${st.d} תיקו</span><span>${st.l} הפסדים</span></div>
- <div class="k3"><div><b dir="ltr">${st.gf}:${st.ga}</b><span>שערים</span></div><div><b dir="ltr">${st.gd > 0 ? "+" : ""}${st.gd}</b><span>הפרש</span></div><div><b>${st.p ? st.pct + "%" : "—"}</b><span>הצלחה</span></div></div></div>
+ <div class="k3"><div><b dir="ltr">${st.gf}:${st.ga}</b><span>שערים</span></div><div><b dir="ltr">${st.gd > 0 ? "+" : ""}${st.gd}</b><span>הפרש</span></div>${sched.meta?.showSuccessPercentage ? `<div><b>${st.p ? st.pct + "%" : "—"}</b><span>הצלחה</span></div>` : ""}</div></div>
  ${nextCard}
  ${venue && venue !== nx?.venue ? `<div class="ven"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><small>מגרש בית</small><b>${venue}</b></div>${waze(venue)}</div>` : ""}
  <div class="sec">תוצאות אחרונות</div>
