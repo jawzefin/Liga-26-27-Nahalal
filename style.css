@@ -31,7 +31,6 @@ button{all:unset;cursor:pointer}a{color:inherit;text-decoration:none}
 .s>div{display:flex;flex-direction:column;gap:2px;min-width:0}.s.a>div{align-items:flex-end}
 .vs{font-size:.7rem;font-weight:700;color:var(--mute);text-align:center}.vs i{font-style:normal;font-size:.8rem;color:var(--ink)}
 .zp{font-size:.62rem;font-weight:800;color:#2b1d00;background:var(--gold);border-radius:6px;padding:0 6px;align-self:flex-start}.s.a .zp{align-self:flex-end}
-.upd{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--acc) 14%,var(--sf));border:1px solid var(--acc);border-radius:16px;padding:10px 14px;font-size:.82rem;font-weight:700;line-height:1.3}.upd>span{flex:1}.upd[hidden]{display:none}.upd button{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;color:var(--mute);flex:none}
 .note{text-align:center;color:var(--mute);font-size:.8rem}
 .cal{background:var(--sf);border:1px solid var(--line);border-radius:28px;padding:14px 12px 16px}
 .cm{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}.cm b{font-size:1.2rem;font-weight:800}

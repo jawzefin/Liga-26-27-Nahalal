@@ -18,7 +18,7 @@ const KEY = "team2";
 let ME; try { ME = localStorage.getItem(KEY); localStorage.removeItem("team"); } catch {}
 if (!teams[ME]) ME = DEF;
 // first visit = nothing stored yet (skipped when storage is unavailable, so private mode never loops on the welcome screen)
-let needOnboard = false, pick = null, syncUpd = () => {};
+let needOnboard = false, pick = null;
 try { needOnboard = !localStorage.getItem(KEY); localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); } catch { needOnboard = false; }
 const setMe = id => { ME = id; try { localStorage.setItem(KEY, id); } catch {} calM = null; };
 
@@ -43,13 +43,17 @@ const tmb = id => `<a class="tm ${id === ME ? "me" : ""}" href="#/team/${id}">${
 const head = g => `${tmb(g.home)}@@${tmb(g.away)}`;
 
 let lastTab = "#/table", calM = null, calD = 0, cur = 0;
+const updated = (() => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", year: "2-digit", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(sched.updatedAt)).map(x => [x.type, x.value]));
+  return `<p class="note">הלוח עודכן לאחרונה ב-<bdi>${p.day}/${p.month}/${p.year}</bdi> בשעה <bdi>${p.hour}:${p.minute}</bdi></p>`;
+})();
 const tabs = on => `<div class="tabs"><a href="#/table" class="${on == "t" ? "on" : ""}">טבלה</a><a href="#/rounds" class="${on == "r" ? "on" : ""}">מחזורים</a></div>`;
 const backBar = (title, sub, right = "") => `<div class="bar"><a class="ic" href="${lastTab}" aria-label="חזרה"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a><div style="text-align:center"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${right || '<span style="width:44px"></span>'}</div>`;
 
 function table() {
   lastTab = "#/table";
   const rows = standings(R, teams);
-  return tabs("t") + `<div class="tbl"><div class="th"><span>#</span><span>קבוצה</span><span>מש׳</span><span>הפרש</span><span>נק׳</span></div>${rows.map(r => `<a class="tr ${r.id === ME ? "fav" : ""}" href="#/team/${r.id}"><span class="ps">${r.pos}</span><span class="tn">${logo(r.id, r.id === ME)}<span class="tt"><b>${nm(r.id)}</b>${zp(r.id)}</span></span><span class="m">${r.p}</span><span class="m" dir="ltr">${r.gd > 0 ? "+" + r.gd : r.gd}</span><span class="pt">${r.pts}</span></a>`).join("")}</div><p class="note">לחיצה על קבוצה פותחת את הדף שלה</p>`;
+  return tabs("t") + `<div class="tbl"><div class="th"><span>#</span><span>קבוצה</span><span>מש׳</span><span>הפרש</span><span>נק׳</span></div>${rows.map(r => `<a class="tr ${r.id === ME ? "fav" : ""}" href="#/team/${r.id}"><span class="ps">${r.pos}</span><span class="tn">${logo(r.id, r.id === ME)}<span class="tt"><b>${nm(r.id)}</b>${zp(r.id)}</span></span><span class="m">${r.p}</span><span class="m" dir="ltr">${r.gd > 0 ? "+" + r.gd : r.gd}</span><span class="pt">${r.pts}</span></a>`).join("")}</div>${updated}`;
 }
 
 const nextIdx = () => { const i = R.findIndex(r => { const g = mine(r); return g && !played(g) && g.date >= todayS; }); return i < 0 ? R.length - 1 : i; };
@@ -70,7 +74,7 @@ function rounds(n) {
  <div class="hero"><div class="hh"><span>המשחק של ${nm(ME)}</span><span class="chip">${homeG ? "בית" : "חוץ"}</span></div><div class="hm">${a}${centre}${b}</div></div>
  <div class="sec">שאר המשחקים במחזור<span>${r.games.length - 1}</span></div>
  <div class="list">${ks.map(ds => (many ? dayHdr(ds) : "") + by[ds].map(row).join("")).join("")}</div>
- <p class="note"><span class="zp" style="display:inline">צו פיוס</span> לא משחקת בשבת</p>`;
+ <p class="note"><span class="zp" style="display:inline">צו פיוס</span> לא משחקת בשבת</p>${updated}`;
 }
 
 const fxRowOf = (g, id, nx) => {
@@ -172,7 +176,7 @@ function bind(a, b) {
     const draw = q => { $("app").innerHTML = welcome(q); bind("welcome"); };
     document.querySelectorAll(".cl button").forEach(x => x.onclick = () => { pick = x.dataset.t; draw($("q").value); });
     const i = $("q"); i.oninput = () => { const p = i.selectionStart; draw(i.value); $("q").focus(); $("q").setSelectionRange(p, p); };
-    const done = id => { setMe(id); needOnboard = false; syncUpd(); if (!location.hash) location.hash = "#/table"; render(); };
+    const done = id => { setMe(id); needOnboard = false; if (!location.hash) location.hash = "#/table"; render(); };
     if (pick) $("go").onclick = () => done(pick);
     $("skip").onclick = () => done(DEF);
   } else if (a == "set") {
@@ -189,17 +193,6 @@ function bind(a, b) {
 }
 const rerender = () => { const y = scrollY; render(); scrollTo(0, y); };
 addEventListener("hashchange", render);
-
-// "schedule updated" notice, driven by data/schedule.json (shown for 3 days, dismissible)
-{
-  const up = sched.updatedAt, day = up.slice(0, 10);
-  let seen; try { seen = localStorage.getItem("upd"); } catch {}
-  const recent = Date.now() - new Date(up) < 3 * 864e5;
-  $("updt").innerHTML = `🔔 לוח המשחקים עודכן בתאריך <bdi>${dmy(day)}/${day.slice(2, 4)}</bdi>`;
-  const sync = () => { const h = location.hash; $("upd").hidden = needOnboard || !recent || seen === up || /#\/(cal|set|team)/.test(h); };
-  $("ux").onclick = () => { seen = up; try { localStorage.setItem("upd", up); } catch {} sync(); };
-  syncUpd = sync; addEventListener("hashchange", sync); sync();
-}
 
 let x0;
 addEventListener("touchstart", e => (x0 = e.touches[0].clientX));
