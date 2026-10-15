@@ -94,3 +94,10 @@ export function homeVenue(games, id) {
   for (const [v, k] of c) if (!best || k >= c.get(best)) best = v;
   return best;
 }
+
+// API payload + teams + fallback rounds -> {rounds, meta, errs}. Shared by the update script and /api/schedule.
+export function buildSchedule(api, teams, fallback) {
+  const norm = normalizeApi(api), rounds = mergeRounds(norm, fallback);
+  return { rounds, errs: validate(rounds, Object.keys(teams)),
+    meta: { showSuccessPercentage: !!api.league?.showSuccessPercentage, pointsAdjustments: api.league?.pointsAdjustments || [], apiRounds: norm.length } };
+}

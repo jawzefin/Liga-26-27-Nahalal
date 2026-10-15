@@ -2,7 +2,7 @@
 // Run by .github/workflows/update-schedule.yml (and by hand: node scripts/update-schedule.mjs).
 // Safe by design: any problem => exit 1 and the last good data/schedule.json is left untouched.
 import { readFile, writeFile } from "node:fs/promises";
-import { normalizeApi, mergeRounds, validate } from "../lib.mjs";
+import { buildSchedule } from "../lib.mjs";
 
 const LEAGUE = "ליגת ילדים ב' שרון", SEASON = 28;
 const API = `https://junior-league-api-server-928016183646.us-central1.run.app/api/public/leagues/${encodeURIComponent(LEAGUE)}/matches?season=${SEASON}`;
@@ -27,12 +27,8 @@ const serialize = d => `{"updatedAt":${JSON.stringify(d.updatedAt)},"meta":${JSO
 const api = await fetchApi();
 const teams = await read("../data/teams.json");
 const fallback = (await read("../data/fallback-rounds.json")).rounds;
-const rounds = mergeRounds(normalizeApi(api), fallback);
-
-const errs = validate(rounds, Object.keys(teams));
+const { rounds, meta, errs } = buildSchedule(api, teams, fallback);
 if (errs.length) { console.error("validation failed:\n" + errs.join("\n")); process.exit(1); }
-
-const meta = { showSuccessPercentage: !!api.league?.showSuccessPercentage, pointsAdjustments: api.league?.pointsAdjustments || [], apiRounds: normalizeApi(api).length };
 let old = null;
 try { old = await read("../data/schedule.json"); } catch {}
 if (old && JSON.stringify({ meta: old.meta, rounds: old.rounds }) === JSON.stringify({ meta, rounds })) {

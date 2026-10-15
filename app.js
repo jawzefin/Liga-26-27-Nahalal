@@ -1,7 +1,7 @@
 import { standings, anyPlayed, teamGames, nextGame, lastGames, homeVenue, played } from "./lib.mjs";
 
 const get = async p => (await fetch(p, { cache: "no-cache" })).json();
-const [teams, sched] = await Promise.all([get("data/teams.json"), get("data/schedule.json")]);
+const [teams, sched] = await Promise.all([get("data/teams.json"), get("/api/schedule").catch(() => get("data/schedule.json"))]);
 const R = sched.rounds, DEF = "4186"; // נהלל
 const DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 const MON = ["ינו׳", "פבר׳", "מרץ", "אפר׳", "מאי", "יוני", "יולי", "אוג׳", "ספט׳", "אוק׳", "נוב׳", "דצמ׳"];
