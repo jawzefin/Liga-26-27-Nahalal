@@ -47,7 +47,11 @@ const updated = (() => {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", year: "2-digit", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(sched.updatedAt)).map(x => [x.type, x.value]));
   return `<p class="note">הלוח עודכן לאחרונה ב-<bdi>${p.day}/${p.month}/${p.year}</bdi> בשעה <bdi>${p.hour}:${p.minute}</bdi></p>`;
 })();
-const tabs = on => `<div class="tabs"><a href="#/table" class="${on == "t" ? "on" : ""}">טבלה</a><a href="#/rounds" class="${on == "r" ? "on" : ""}">מחזורים</a></div>`;
+// "new update" dot on the rounds tab: compares a hash of the schedule with the one stored when the rounds tab was last opened (first visit just sets the baseline)
+const sig = (str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return h.toString(36); })(JSON.stringify(R));
+let seen = null; try { seen = localStorage.getItem("seen"); if (seen === null) localStorage.setItem("seen", seen = sig); } catch { seen = sig; }
+const markSeen = () => { seen = sig; try { localStorage.setItem("seen", sig); } catch {} };
+const tabs = on => `<div class="tabs"><a href="#/table" class="${on == "t" ? "on" : ""}">טבלה</a><a href="#/rounds" class="${on == "r" ? "on" : ""}"${on != "r" && seen !== sig ? ' aria-label="מחזורים, יש עדכון"' : ""}>מחזורים${on != "r" && seen !== sig ? '<i class="pd"></i>' : ""}</a></div>`;
 const backBar = (title, sub, right = "") => `<div class="bar"><a class="ic" href="${lastTab}" aria-label="חזרה"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a><div style="text-align:center"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${right || '<span style="width:44px"></span>'}</div>`;
 
 function table() {
@@ -59,6 +63,7 @@ function table() {
 const nextIdx = () => { const i = R.findIndex(r => { const g = mine(r); return g && !played(g) && g.date >= todayS; }); return i < 0 ? R.length - 1 : i; };
 
 function rounds(n) {
+  markSeen();
   cur = n ? Math.max(0, R.findIndex(r => r.n == n)) : nextIdx();
   const r = R[cur], g = mine(r), d = D(g.date), homeG = g.home === ME;
   lastTab = "#/rounds/" + r.n;
