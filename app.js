@@ -23,6 +23,8 @@ try { needOnboard = !localStorage.getItem(KEY); localStorage.setItem("_t", "1");
 const setMe = id => { ME = id; try { localStorage.setItem(KEY, id); } catch {} calM = null; };
 
 const NAV = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
+// player lists live on the association site (not scraped: it is bot-protected and the data is about minors); the itemid is the same for every team
+const FA = "https://www.football.org.il/team-details/?itemid=%7B2AE09DED-5019-4C49-BFD5-4458C66F9D24%7D&team_id=";
 const waze = (v, cls = "") => `<a class="waze ${cls}" target="_blank" rel="noopener" href="https://waze.com/ul?q=${encodeURIComponent(v)}&navigate=yes">${NAV}ניווט ב-Waze</a>`;
 const nm = id => teams[id].name.replace(/\s*"צו פיוס"/, "");
 const zp = id => teams[id].zp ? '<span class="zp">צו פיוס</span>' : "";
@@ -106,6 +108,7 @@ function team(id) {
   const fxRow = g => fxRowOf(g, id, nx);
   const star = `<div class="mw"><button class="fav-b" id="mb" aria-label="עוד פעולות" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
  <div class="menu" id="mn" role="menu" hidden><button role="menuitem" id="sh"><svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>שיתוף</button>
+ <a role="menuitem" class="mi" target="_blank" rel="noopener" href="${FA}${id}&season_id=28"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 0 1 0 5.8M18.5 14.4c1.6.8 2.5 2.7 2.5 5.6"/></svg>סגל השחקנים באתר ההתאחדות</a>
  <button role="menuitem" id="fav" ${fav ? "disabled" : ""}><svg viewBox="0 0 24 24" class="st${fav ? " on" : ""}"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>${fav ? "קבוצה מעודפת" : "סימון כקבוצה מעודפת"}</button></div></div>`;
   return backBar("דף קבוצה", "", star) + `<div class="tp">${logo(id)}<h2>${nm(id)}</h2><div class="pl">${fav ? '<span class="chip">הקבוצה שלי</span>' : ""}${zp(id)}${st.p ? "" : "<span>עוד לא שוחקו משחקים</span>"}</div>${st.form.length ? `<div class="form">${st.form.map(f => `<span class="fm ${f}">${HE[f]}</span>`).join("")}</div>` : ""}</div>
  <div class="kpi"><div class="kt"><div class="kp"><b>${st.pts}</b><span>נקודות</span><small>${st.p} משחקים</small></div>${st.p ? `<span class="chip">מקום ${st.pos}</span>` : ""}</div>
