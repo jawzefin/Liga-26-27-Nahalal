@@ -104,7 +104,9 @@ function team(id) {
   const ni = Math.max(0, gs.indexOf(nx)), from = Math.max(0, ni - 1), WIN = 6;
   const shown = gs.slice(from, from + WIN);
   const fxRow = g => fxRowOf(g, id, nx);
-  const star = `<button class="fav-b ${fav ? "on" : ""}" id="fav" aria-label="הקבוצה שלי"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></button>`;
+  const star = `<div class="mw"><button class="fav-b" id="mb" aria-label="עוד פעולות" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+ <div class="menu" id="mn" role="menu" hidden><button role="menuitem" id="sh"><svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>שיתוף</button>
+ <button role="menuitem" id="fav" ${fav ? "disabled" : ""}><svg viewBox="0 0 24 24" class="st${fav ? " on" : ""}"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>${fav ? "קבוצה מעודפת" : "סימון כקבוצה מעודפת"}</button></div></div>`;
   return backBar("דף קבוצה", "", star) + `<div class="tp">${logo(id)}<h2>${nm(id)}</h2><div class="pl">${fav ? '<span class="chip">הקבוצה שלי</span>' : ""}${zp(id)}${st.p ? "" : "<span>עוד לא שוחקו משחקים</span>"}</div>${st.form.length ? `<div class="form">${st.form.map(f => `<span class="fm ${f}">${HE[f]}</span>`).join("")}</div>` : ""}</div>
  <div class="kpi"><div class="kt"><div class="kp"><b>${st.pts}</b><span>נקודות</span><small>${st.p} משחקים</small></div>${st.p ? `<span class="chip">מקום ${st.pos}</span>` : ""}</div>
  <div class="wdl">${st.p ? `${st.w ? `<i class="W" style="flex:${st.w}"></i>` : ""}${st.d ? `<i class="D" style="flex:${st.d}"></i>` : ""}${st.l ? `<i class="L" style="flex:${st.l}"></i>` : ""}` : '<i class="E"></i>'}</div>
@@ -188,13 +190,28 @@ function bind(a, b) {
     document.querySelectorAll(".cl button").forEach(x => x.onclick = () => { setMe(x.dataset.t); rerender(); });
     const i = $("q"); i.oninput = () => { const p = i.selectionStart; $("app").innerHTML = settings(i.value); bind("set"); $("q").focus(); $("q").setSelectionRange(p, p); };
   } else if (a == "team" && teams[b]) {
-    $("fav").onclick = () => { setMe(b); rerender(); };
+    const mn = $("mn"), mb = $("mb"), close = () => { mn.hidden = true; mb.setAttribute("aria-expanded", "false"); };
+    mb.onclick = e => { e.stopPropagation(); mn.hidden = !mn.hidden; mb.setAttribute("aria-expanded", String(!mn.hidden)); };
+    $("fav").onclick = () => { setMe(b); rerender(); toast("סומנה כקבוצה מעודפת"); };
+    $("sh").onclick = () => { close(); share(b); };
     const more = $("more");
     if (more) more.onclick = () => {
       const gs = teamGames(R, b), nx = nextGame(gs, todayS);
       $("fxl").innerHTML = gs.map(g => fxRowOf(g, b, nx)).join("");
     };
   }
+}
+addEventListener("click", () => { const m = $("mn"); if (m && !m.hidden) { m.hidden = true; $("mb").setAttribute("aria-expanded", "false"); } });
+addEventListener("keydown", e => { const m = $("mn"); if (e.key === "Escape" && m && !m.hidden) { m.hidden = true; $("mb").focus(); } });
+function toast(t) {
+  const el = document.createElement("div"); el.className = "toast"; el.textContent = t; el.setAttribute("role", "status");
+  document.body.append(el); setTimeout(() => el.remove(), 2400);
+}
+// native share sheet where available, otherwise copy the link
+async function share(id) {
+  const url = location.origin + location.pathname + "#/team/" + id, title = nm(id) + " · ליגת ילדים ב׳ שרון";
+  if (navigator.share) { try { await navigator.share({ title, text: title, url }); } catch {} return; }
+  try { await navigator.clipboard.writeText(url); toast("הקישור הועתק"); } catch { prompt("העתק את הקישור", url); }
 }
 const rerender = () => { const y = scrollY; render(); scrollTo(0, y); };
 addEventListener("hashchange", render);
