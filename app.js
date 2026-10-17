@@ -1,4 +1,4 @@
-import { standings, anyPlayed, teamGames, nextGame, lastGames, homeVenue, played } from "./lib.mjs";
+import { currentRound, standings, anyPlayed, teamGames, nextGame, lastGames, homeVenue, played } from "./lib.mjs";
 
 const get = async p => (await fetch(p, { cache: "no-cache" })).json();
 const [teams, sched] = await Promise.all([get("data/teams.json"), get("/api/schedule").catch(() => get("data/schedule.json"))]);
@@ -62,7 +62,8 @@ function table() {
   return tabs("t") + `<div class="tbl"><div class="th"><span>#</span><span>קבוצה</span><span>מש׳</span><span>הפרש</span><span>נק׳</span></div>${rows.map(r => `<a class="tr ${r.id === ME ? "fav" : ""}" href="#/team/${r.id}"><span class="ps">${r.pos}</span><span class="tn">${logo(r.id, r.id === ME)}<span class="tt"><b>${nm(r.id)}</b>${zp(r.id)}</span></span><span class="m">${r.p}</span><span class="m" dir="ltr">${r.gd > 0 ? "+" + r.gd : r.gd}</span><span class="pt">${r.pts}</span></a>`).join("")}</div>${updated}`;
 }
 
-const nextIdx = () => { const i = R.findIndex(r => { const g = mine(r); return g && !played(g) && g.date >= todayS; }); return i < 0 ? R.length - 1 : i; };
+// default round = the latest round that has started, so results stay visible until the next round begins
+const nextIdx = () => currentRound(R, todayS);
 
 function rounds(n) {
   markSeen();

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { toLocal, normalizeApi, mergeRounds, validate, standings, anyPlayed, teamGames, nextGame, lastGames, homeVenue } from "../lib.mjs";
+import { toLocal, normalizeApi, mergeRounds, validate, standings, anyPlayed, teamGames, nextGame, lastGames, homeVenue, currentRound } from "../lib.mjs";
 
 const T = { A: { name: "א" }, B: { name: "ב" }, C: { name: "ג" }, D: { name: "ד" } };
 const g = (home, away, date, hs = null, as = null, extra = {}) => ({ home, away, date, time: null, venue: null, hs, as, ...extra });
@@ -86,4 +86,17 @@ test("teamGames / nextGame / lastGames / homeVenue", () => {
   assert.deepEqual(lastGames(gs).map(x => x.n), [2, 1]); // newest first
   assert.equal(homeVenue(gs, "A"), "מגרש 1");
   assert.equal(homeVenue(gs, "B"), null);
+});
+
+test("currentRound: latest round that has started", () => {
+  const rounds = [
+    { n: 1, games: [g("A", "B", "2026-10-16", 1, 0), g("C", "D", "2026-10-26")] },
+    { n: 2, games: [g("A", "C", "2026-10-28")] },
+    { n: 3, games: [g("A", "D", "2026-11-04")] },
+  ];
+  assert.equal(currentRound(rounds, "2026-10-01"), 0); // before the season: first round
+  assert.equal(currentRound(rounds, "2026-10-17"), 0); // round 1 started, its results stay up
+  assert.equal(currentRound(rounds, "2026-10-27"), 0); // still round 1 until round 2 begins
+  assert.equal(currentRound(rounds, "2026-10-28"), 1); // round 2's first game day
+  assert.equal(currentRound(rounds, "2027-06-01"), 2); // after the season: last round
 });

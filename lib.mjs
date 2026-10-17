@@ -86,6 +86,14 @@ export function teamGames(rounds, id) {
 export const nextGame = (games, today) => games.find(g => !played(g) && g.date >= today) || null;
 export const lastGames = (games, k = 5) => games.filter(played).slice(-k).reverse();
 
+// Index of the round to open by default: the latest round that has already started (any game dated today or earlier),
+// so a finished round stays on screen, with its results, until the next one begins. Before the season starts: the first round.
+export function currentRound(rounds, today) {
+  let idx = 0;
+  rounds.forEach((r, i) => { if (r.games.some(x => x.date <= today)) idx = i; });
+  return idx;
+}
+
 // Most common venue of the team's home games (ties: the latest one). null when the API gave none.
 export function homeVenue(games, id) {
   const c = new Map();
